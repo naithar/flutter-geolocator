@@ -1,8 +1,9 @@
 group 'com.baseflow.geolocator'
 version '1.0'
-def args = ["-Xlint:deprecation","-Xlint:unchecked","-Werror"]
+def args = ["-Xlint:deprecation","-Xlint:unchecked"]
 
 buildscript {
+
     repositories {
         google()
         mavenCentral()
@@ -39,6 +40,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    buildToolsVersion '30.0.2'
 }
 
 dependencies {

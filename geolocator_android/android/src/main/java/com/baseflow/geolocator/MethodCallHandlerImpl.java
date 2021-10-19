@@ -26,6 +26,17 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import java.util.Map;
 
+import android.content.ServiceConnection;
+import android.content.Context;
+import android.os.Build;
+import android.app.Service;
+import android.os.Binder;
+import android.os.IBinder;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.content.ComponentName;
+
 /**
  * Translates incoming Geolocator MethodCalls into well formed Java function calls for {@link
  * GeolocationManager}.
@@ -36,6 +47,20 @@ class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
   private final PermissionManager permissionManager;
   private final GeolocationManager geolocationManager;
   private final LocationAccuracyManager locationAccuracyManager;
+
+  @Nullable private GeolocatorNotificationManager service;
+  private boolean bound;
+  private ServiceConnection serviceConnection = new ServiceConnection() {
+      public void onServiceConnected(ComponentName className, IBinder binder) {
+        bound = true;
+        service = ((GeolocatorNotificationManager.LocalBinder)binder).getService();
+      }
+
+      public void onServiceDisconnected(ComponentName className) {
+          service = null;
+          bound = false;
+      }
+  };
 
   @Nullable private Context context;
 
@@ -103,6 +128,8 @@ class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
     channel = new MethodChannel(messenger, "flutter.baseflow.com/geolocator");
     channel.setMethodCallHandler(this);
     this.context = context;
+
+    startNotificationService();
   }
 
   /**
@@ -118,6 +145,8 @@ class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
 
     channel.setMethodCallHandler(null);
     channel = null;
+
+    stopNotificationService();
   }
 
   void setActivity(@Nullable Activity activity) {
@@ -173,6 +202,20 @@ class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
         (Location location) -> result.success(LocationMapper.toHashMap(location)),
         (ErrorCodes errorCode) ->
             result.error(errorCode.toString(), errorCode.toDescription(), null));
+  }
+
+  private void startNotificationService() {
+    if (bound) { return; }
+
+    Intent intent = new Intent(this.context, GeolocatorNotificationManager.class);
+    this.context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+  }
+
+  private void stopNotificationService() {
+    if (!bound) { return; }
+
+    context.unbindService(serviceConnection);
+    bound = false;
   }
 
   private void onGetCurrentPosition(MethodCall call, MethodChannel.Result result) {
