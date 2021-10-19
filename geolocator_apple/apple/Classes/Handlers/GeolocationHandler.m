@@ -142,9 +142,7 @@
         horizontalAccuracy:self.latestLocation.horizontalAccuracy
           verticalAccuracy:self.latestLocation.verticalAccuracy
                     course:heading
-            courseAccuracy:self.latestLocation.courseAccuracy
-                     speed:self.latestLocation.speed 
-             speedAccuracy:self.latestLocation.speedAccuracy
+                     speed:self.latestLocation.speed
                  timestamp:self.latestLocation.timestamp];
 
     return location;
