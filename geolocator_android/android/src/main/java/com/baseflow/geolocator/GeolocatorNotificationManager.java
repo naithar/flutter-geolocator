@@ -61,11 +61,17 @@ public class GeolocatorNotificationManager extends Service {
             pendingIntent = PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
 
-        int iconID = getResources().getIdentifier("@mipmap/ic_launcher", "mipmap", this.getPackageName());
+        boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
+
+        int iconID = useWhiteIcon ?
+            getResources().getIdentifier("@mipmap/ic_notification", "mipmap", this.getPackageName()) :
+            getResources().getIdentifier("@mipmap/ic_launcher", "mipmap", this.getPackageName());
+
+        int largeIconID = getResources().getIdentifier("@mipmap/ic_launcher", "mipmap", this.getPackageName());
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "BackgroundLocation")
                 .setSmallIcon(iconID)
-                .setLargeIcon(android.graphics.BitmapFactory.decodeResource(getResources(), iconID))
+                .setLargeIcon(android.graphics.BitmapFactory.decodeResource(getResources(), largeIconID))
                 .setContentTitle("Приложение запущено")
                 .setContentText("Вернуться в приложение")
                 .setOngoing(true)
