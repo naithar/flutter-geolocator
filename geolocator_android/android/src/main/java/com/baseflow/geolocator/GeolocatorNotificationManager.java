@@ -66,7 +66,7 @@ public class GeolocatorNotificationManager extends Service {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "BackgroundLocation")
                 .setSmallIcon(iconID)
                 .setLargeIcon(android.graphics.BitmapFactory.decodeResource(getResources(), iconID))
-                .setContentTitle("LaPTI")
+                .setContentTitle("Приложение запущено")
                 .setContentText("Вернуться в приложение")
                 .setOngoing(true)
                 .setSound(null)
